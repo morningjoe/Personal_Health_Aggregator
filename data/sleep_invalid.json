@@ -1,0 +1,42 @@
+{
+  "records": [
+    {
+      "date": "2023-11-01",
+      "sleep_start": "2023-11-01T23:00:00Z",
+      "sleep_end": "2023-11-02T07:00:00Z",
+      "duration_hours": 8,
+      "quality_score": 85
+    },
+    {
+      "date": "2023-11-03",
+      "sleep_start": "2023-11-03T22:00:00Z",
+      "sleep_end": "2023-11-04T06:00:00Z",
+      "duration_hours": 25,
+      "quality_score": 90,
+      "_comment": "EDGE: duration_hours out of range ( > 24 )"
+    },
+    {
+      "date": "2023-11-04",
+      "sleep_start": "2023-11-04T22:00:00Z",
+      "sleep_end": "2023-11-05T06:00:00Z",
+      "duration_hours": 8
+      
+    },
+    {
+      "date": "2023-11-05",
+      "sleep_start": "bad-timestamp",
+      "sleep_end": "2023-11-06T06:00:00Z",
+      "duration_hours": 8,
+      "quality_score": "NaN",
+      "_comment": "EDGE: bad timestamp format and non-numeric quality_score"
+    },
+    {
+      "date": "2030-01-01",
+      "sleep_start": "2030-01-01T00:00:00Z",
+      "sleep_end": "2030-01-01T08:00:00Z",
+      "duration_hours": 8,
+      "quality_score": 50,
+      "_comment": "EDGE: future-dated record"
+    }
+  ]
+}

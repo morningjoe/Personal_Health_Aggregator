@@ -18,13 +18,12 @@
 
 This project is the result of collaborative development with clear separation between original design/architecture and implementation:
 
-#### Claude (AI Assistant) - Implementation Phase
+#### Development with Copilot AI Assistant - Implementation Phase
 - **Day boundary crossing detection**: Implemented the timezone conversion logic that detects when workout timestamps cross midnight
 - **Reporting functions**: Developed all console output functions (`print_day_boundary_analysis()`, `print_merged_data()`, `print_correlations()`)
 - **CLI interface**: Built the argparse-based command-line interface with comprehensive help messages
 - **Code modularization**: Refactored monolithic code into separate modules (models.py, data_loader.py, merger.py, reporter.py)
 - **JSON output generation**: Created JSON serialization functions with proper datetime handling
-- **Testing and validation**: Executed test cases and verified edge case handling
 
 #### Original Design/Drafting - Architecture Phase
 - **Input JSON schema**: Designed sleep.json and workouts.json formats with timezone support
@@ -37,9 +36,10 @@ This project is the result of collaborative development with clear separation be
   - DST transitions
 - **Data models**: Defined SleepRecord, WorkoutRecord, and DailyAggregate structures
 - **Correlation metrics**: Specified what metrics to calculate and how to analyze them
+- **Testing and validation**: Executed test cases and verified edge case handling
 - **Test scenarios**: Created comprehensive test data with known edge cases
+- **Library References**: Utilized zoneinfo, timezone, and datetime libraries, which are well established and safe for production
 
-This collaborative approach ensured solid architectural foundations with professional-grade implementation.
 
 ---
 
@@ -187,7 +187,7 @@ class DailyAggregate:
 
 #### `load_sleep_data(filepath: str) -> list[SleepRecord]`
 
-Loads sleep data from a JSON file and normalizes to UTC.
+Loads sleep data from a JSON file and normalizes to UTC. **Invalid records are skipped with warnings.**
 
 **Input Format:**
 ```json
@@ -205,21 +205,37 @@ Loads sleep data from a JSON file and normalizes to UTC.
 
 **Process:**
 1. Parse JSON file
-2. Convert ISO 8601 timestamps to datetime objects
-3. Remove timezone info from UTC designation (Z -> +00:00)
-4. Use sleep_end date as the attribution date
-5. Return list of SleepRecord objects
+2. For each record:
+   - Validate required fields (sleep_start, sleep_end, duration_hours, quality_score)
+   - Convert ISO 8601 timestamps to datetime objects
+   - Validate numeric ranges (duration_hours: 0-24, quality_score: 0-100)
+   - Use sleep_end date as the attribution date
+   - If any validation fails: skip record and print warning
+3. Return list of valid SleepRecord objects
+
+**Skipped Records:**
+Records are skipped and a warning is printed for:
+- Missing required fields
+- Invalid timestamp format (not ISO 8601 with Z suffix)
+- Out-of-range values (duration_hours < 0 or > 24, quality_score < 0 or > 100)
+
+**Example Output:**
+```
+  Loaded 12 sleep records (UTC)
+  Warning: Skipped 1 invalid sleep record(s):
+    - Record 9: Invalid numeric values. Quality score must be between 0 and 100, got 150
+```
 
 **Exceptions:**
-- `FileNotFoundError` - File doesn't exist
-- `json.JSONDecodeError` - Invalid JSON format
-- `ValueError` - Invalid timestamp format
+- `FileNotFoundError` - File doesn't exist (execution stops)
+- `json.JSONDecodeError` - Invalid JSON format (execution stops)
+- `KeyError` - Missing 'records' key (execution stops)
 
 ---
 
 #### `load_workout_data(filepath: str) -> list[WorkoutRecord]`
 
-Loads workout data from JSON and converts from local time to UTC.
+Loads workout data from JSON and converts from local time to UTC. **Invalid records are skipped with warnings.**
 
 **Input Format:**
 ```json
@@ -239,19 +255,41 @@ Loads workout data from JSON and converts from local time to UTC.
 
 **Process:**
 1. Parse JSON file
-2. For each entry:
+2. For each record:
+   - Validate required fields (id, timestamp, tz, type, duration_min, calories)
+   - Validate timezone (must be valid IANA identifier)
    - Parse local timestamp (format: YYYY-MM-DD HH:MM:SS)
    - Create timezone-aware datetime in local timezone
    - Convert to UTC using `astimezone()`
+   - Validate numeric ranges (duration_min: 0-1440, calories: ≥ 0)
    - Compare local date vs UTC date (detect boundary crossing)
    - Create WorkoutRecord with all data
-3. Return list of WorkoutRecord objects
+   - If any validation fails: skip record and print warning
+3. Return list of valid WorkoutRecord objects
+
+**Skipped Records:**
+Records are skipped and a warning is printed for:
+- Missing required fields
+- Invalid timezone identifier (not in IANA database)
+- Invalid timestamp format (not YYYY-MM-DD HH:MM:SS)
+- Out-of-range numeric values (duration_min < 0 or > 1440, calories < 0)
+- DST transition edge cases (non-existent local times during spring-forward)
+
+**Example Output:**
+```
+  Warning: Skipped 5 invalid workout record(s):
+    - Record 8: Invalid timezone 'Bad/Timezone'. Use IANA timezone identifiers.
+    - Record 11: Missing required fields: tz. Required: calories, duration_min, id, timestamp, type, tz
+    - Record 12: Invalid numeric values. Duration must be between 0 and 1440 minutes, got -10
+    - Record 13: Invalid numeric values. Duration must be between 0 and 1440 minutes, got 2000
+    - Record 15: Invalid timestamp format. Error: time data '2023/10/01 08:30' does not match format '%Y-%m-%d %H:%M:%S'
+  Loaded 11 workout records (converted from local time)
+```
 
 **Exceptions:**
-- `FileNotFoundError` - File doesn't exist
-- `json.JSONDecodeError` - Invalid JSON format
-- `ZoneInfoNotFoundError` - Invalid timezone identifier
-- `ValueError` - Invalid timestamp format
+- `FileNotFoundError` - File doesn't exist (execution stops)
+- `json.JSONDecodeError` - Invalid JSON format (execution stops)
+- `KeyError` - Missing 'workout_log' key (execution stops)
 
 ---
 
@@ -508,24 +546,91 @@ Reference: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 - Totals correctly summed
 - Each displayed separately in output
 
+## Included Test Files
+
+The repository includes several test JSON files useful for exercising validation
+paths and edge-case behavior. Use these when developing or when validating
+changes to loaders and merging logic.
+
+- `data/sleep_invalid.json` — Mixed valid + invalid sleep records (out-of-range
+  duration, missing fields, malformed timestamps, future dates).
+- `data/workouts_invalid.json` — Mixed valid + invalid workout records
+  (invalid timezone, missing `tz`, negative / excessively large durations,
+  malformed timestamps).
+- `data/workouts_multipletz.json` — Valid workout records reported in multiple
+  timezones (America/Los_Angeles, Europe/London, Asia/Tokyo, UTC) for
+  cross-timezone and day-boundary testing.
+- `data/sleep_edgecases.json` — Valid sleep edge cases (zero duration, maximum
+  quality score, cross-year sleep) for verifying aggregation and correlation
+  logic.
+
+Example commands:
+
+```powershell
+# Exercise invalid test sets (shows skipped records and warnings)
+python main.py --sleep data/sleep_invalid.json --workouts data/workouts_invalid.json --verbose
+
+# Test multi-timezone behavior and boundary crossings
+python main.py --sleep data/sleep.json --workouts data/workouts_multipletz.json --show-boundaries
+
+# Test edge-case sleep records
+python main.py --sleep data/sleep_edgecases.json --workouts data/workouts.json --show-summary
+```
+
 ### 5. Invalid Timezone
 
-**Scenario:** Timezone string "America/New_Yrok" (typo)
+**Scenario:** Timezone string "America/Los_Angel" (typo)
 
 **Handling:**
-- Raises `ZoneInfoNotFoundError`
-- Caught in main() with helpful error message
-- User prompted to check timezone spelling
+- Record is **skipped** with a warning
+- Warning displays: `Invalid timezone 'America/Los_Angel'. Use IANA timezone identifiers.`
+- Processing continues with remaining valid records
+- Final summary includes count of skipped records
+
+**Example Output:**
+```
+Warning: Skipped 1 invalid workout record(s):
+  - Record 8: Invalid timezone 'Bad/Timezone'. Use IANA timezone identifiers.
+Loaded 11 workout records (converted from local time)
+```
 
 ### 6. DST Transitions
 
-**Scenario:** Daylight Saving Time change (e.g., spring forward)
+**Scenario:** Daylight Saving Time change (e.g., spring forward on March 12, 2 AM → 3 AM)
 
 **Handling:**
-- `zoneinfo` automatically handles DST
-- 2:30 AM doesn't exist on spring-forward day
-- Invalid times raise ValueError
+- If a timestamp refers to a non-existent time during DST transition:
+  - Record is **skipped** with a warning
+  - Warning displays: `Invalid timestamp format. Error: [specific zoneinfo error]`
+- Valid times during DST transitions are automatically converted correctly
 - UTC conversion is always accurate
+
+### 7. Missing Required Fields
+
+**Scenario:** Workout record missing `tz` field
+
+**Handling:**
+- Record is **skipped** with a warning
+- Warning displays: `Missing required fields: tz. Required: calories, duration_min, id, timestamp, type, tz`
+- Processing continues with valid records
+
+### 8. Invalid Numeric Values
+
+**Scenario:** Negative duration (`duration_min: -10`) or exceeding limits (`duration_min: 2000`)
+
+**Handling:**
+- Record is **skipped** with a warning
+- Warning displays: `Invalid numeric values. Duration must be between 0 and 1440 minutes, got 2000`
+- Processing continues with valid records
+
+### 9. Bad Timestamp Format
+
+**Scenario:** Timestamp with wrong format (`2023/10/01 08:30` instead of `2023-10-01 08:30:00`)
+
+**Handling:**
+- Record is **skipped** with a warning
+- Warning displays: `Invalid timestamp format. Error: time data '2023/10/01 08:30' does not match format '%Y-%m-%d %H:%M:%S'`
+- Processing continues with valid records
 
 ---
 

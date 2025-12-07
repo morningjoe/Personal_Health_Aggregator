@@ -47,6 +47,7 @@ def validate_workout_entry(entry: dict, index: int) -> None:
 def load_sleep_data(filepath: str) -> list[SleepRecord]:
     """
     Load sleep data from JSON file with comprehensive error handling.
+    Skips invalid records and prints warnings for each skipped entry.
     """
     try:
         with open(filepath, 'r') as f:
@@ -64,6 +65,7 @@ def load_sleep_data(filepath: str) -> list[SleepRecord]:
         raise TypeError(f"'records' must be a list, got {type(data['records']).__name__}")
 
     records = []
+    skipped = []
     for idx, entry in enumerate(data['records']):
         try:
             # Validate required fields
@@ -75,7 +77,7 @@ def load_sleep_data(filepath: str) -> list[SleepRecord]:
                 sleep_end = datetime.fromisoformat(entry['sleep_end'].replace('Z', '+00:00'))
             except ValueError as e:
                 raise ValueError(
-                    f"Sleep record {idx}: Invalid timestamp format. Error: {e}"
+                    f"Invalid timestamp format. Error: {e}"
                 )
 
             # Validate numeric fields
@@ -88,7 +90,7 @@ def load_sleep_data(filepath: str) -> list[SleepRecord]:
                 if quality_score < 0 or quality_score > 100:
                     raise ValueError(f"Quality score must be between 0 and 100, got {quality_score}")
             except (ValueError, TypeError) as e:
-                raise ValueError(f"Sleep record {idx}: Invalid numeric values. {e}")
+                raise ValueError(f"Invalid numeric values. {e}")
 
             # Use the wake-up date as the "day" for sleep attribution
             date_utc = sleep_end.date()
@@ -102,7 +104,13 @@ def load_sleep_data(filepath: str) -> list[SleepRecord]:
             ))
 
         except (KeyError, ValueError, TypeError) as e:
-            raise ValueError(f"Error processing sleep record {idx}: {e}")
+            skipped.append((idx, str(e)))
+
+    # Print warnings for skipped records
+    if skipped:
+        print(f"  Warning: Skipped {len(skipped)} invalid sleep record(s):")
+        for idx, error in skipped:
+            print(f"    - Record {idx}: {error}")
 
     return records
 
@@ -110,6 +118,7 @@ def load_sleep_data(filepath: str) -> list[SleepRecord]:
 def load_workout_data(filepath: str) -> list[WorkoutRecord]:
     """
     Load workout data from JSON file with comprehensive error handling.
+    Skips invalid records and prints warnings for each skipped entry.
     """
     try:
         with open(filepath, 'r') as f:
@@ -127,6 +136,7 @@ def load_workout_data(filepath: str) -> list[WorkoutRecord]:
         raise TypeError(f"'workout_log' must be a list, got {type(data['workout_log']).__name__}")
 
     records = []
+    skipped = []
     for idx, entry in enumerate(data['workout_log']):
         try:
             # Validate required fields
@@ -137,17 +147,17 @@ def load_workout_data(filepath: str) -> list[WorkoutRecord]:
                 local_tz = ZoneInfo(entry['tz'])
             except ZoneInfoNotFoundError:
                 raise ValueError(
-                    f"Workout record {idx}: Invalid timezone '{entry['tz']}'. Use IANA timezone identifiers."
+                    f"Invalid timezone '{entry['tz']}'. Use IANA timezone identifiers."
                 )
             except KeyError:
-                raise ValueError(f"Workout record {idx}: 'tz' field is required")
+                raise ValueError(f"'tz' field is required")
 
             # Parse timestamp
             try:
                 local_dt = datetime.strptime(entry['timestamp'], '%Y-%m-%d %H:%M:%S')
             except ValueError as e:
                 raise ValueError(
-                    f"Workout record {idx}: Invalid timestamp format. Error: {e}"
+                    f"Invalid timestamp format. Error: {e}"
                 )
 
             # Make it timezone-aware in local time
@@ -171,7 +181,7 @@ def load_workout_data(filepath: str) -> list[WorkoutRecord]:
                 if calories < 0:
                     raise ValueError(f"Calories must be non-negative, got {calories}")
             except (ValueError, TypeError) as e:
-                raise ValueError(f"Workout record {idx}: Invalid numeric values. {e}")
+                raise ValueError(f"Invalid numeric values. {e}")
 
             records.append(WorkoutRecord(
                 id=str(entry['id']),
@@ -186,6 +196,12 @@ def load_workout_data(filepath: str) -> list[WorkoutRecord]:
             ))
 
         except (KeyError, ValueError, ZoneInfoNotFoundError, TypeError) as e:
-            raise ValueError(f"Error processing workout record {idx}: {e}")
+            skipped.append((idx, str(e)))
+
+    # Print warnings for skipped records
+    if skipped:
+        print(f"  Warning: Skipped {len(skipped)} invalid workout record(s):")
+        for idx, error in skipped:
+            print(f"    - Record {idx}: {error}")
 
     return records

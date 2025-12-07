@@ -14,8 +14,7 @@
       "tz": "America/Los_Angeles",
       "type": "Yoga",
       "duration_min": 30,
-      "calories": 120,
-      "_comment": "EDGE CASE: 11:15 PM PST = Oct 2 06:15 UTC (crosses day boundary)"
+      "calories": 120
     },
     {
       "id": "W003",
@@ -39,8 +38,7 @@
       "tz": "America/Los_Angeles",
       "type": "HIIT",
       "duration_min": 25,
-      "calories": 310,
-      "_comment": "EDGE CASE: 10:45 PM PST = Oct 5 05:45 UTC (crosses day boundary)"
+      "calories": 310
     },
     {
       "id": "W006",
@@ -64,8 +62,7 @@
       "tz": "America/Los_Angeles",
       "type": "Stretching",
       "duration_min": 20,
-      "calories": 60,
-      "_comment": "EDGE CASE: 11:30 PM PST = Oct 7 06:30 UTC (crosses day boundary)"
+      "calories": 60
     }
   ],
   "app_info": {

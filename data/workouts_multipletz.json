@@ -1,0 +1,37 @@
+{
+  "workout_log": [
+    {
+      "id": "M001",
+      "timestamp": "2023-10-01 23:15:00",
+      "tz": "America/Los_Angeles",
+      "type": "Yoga",
+      "duration_min": 30,
+      "calories": 120
+    },
+    {
+      "id": "M002",
+      "timestamp": "2023-10-02 07:30:00",
+      "tz": "Europe/London",
+      "type": "Running",
+      "duration_min": 40,
+      "calories": 300
+    },
+    {
+      "id": "M003",
+      "timestamp": "2023-10-02 16:00:00",
+      "tz": "Asia/Tokyo",
+      "type": "Gym",
+      "duration_min": 50,
+      "calories": 450
+    },
+    {
+      "id": "M004",
+      "timestamp": "2023-10-02 12:00:00",
+      "tz": "UTC",
+      "type": "Walk",
+      "duration_min": 20,
+      "calories": 80
+    }
+  ],
+  "metadata": { "source": "multiple-timezones" }
+}

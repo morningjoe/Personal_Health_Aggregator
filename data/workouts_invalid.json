@@ -1,0 +1,57 @@
+{
+  "workout_log": [
+    {
+      "id": "X001",
+      "timestamp": "2023-11-01 08:30:00",
+      "tz": "America/Los_Angeles",
+      "type": "Running",
+      "duration_min": 45,
+      "calories": 420
+    },
+    {
+      "id": "X002",
+      "timestamp": "2023-11-02 07:00:00",
+      "tz": "Bad/Zone",
+      "type": "Cycling",
+      "duration_min": 60,
+      "calories": 500,
+      "_comment": "EDGE: invalid timezone"
+    },
+    {
+      "id": "X003",
+      "timestamp": "2023-11-02 09:00:00",
+      "type": "Yoga",
+      "duration_min": 30,
+      "calories": 120,
+      "_comment": "EDGE: missing tz field"
+    },
+    {
+      "id": "X004",
+      "timestamp": "2023-11-03 10:00:00",
+      "tz": "America/Los_Angeles",
+      "type": "HIIT",
+      "duration_min": -20,
+      "calories": 300,
+      "_comment": "EDGE: negative duration"
+    },
+    {
+      "id": "X005",
+      "timestamp": "2023-11-04 06:00:00",
+      "tz": "America/Los_Angeles",
+      "type": "Ultra",
+      "duration_min": 2000,
+      "calories": 10000,
+      "_comment": "EDGE: duration too large"
+    },
+    {
+      "id": "X006",
+      "timestamp": "2023/11/01 08:30",
+      "tz": "America/Los_Angeles",
+      "type": "Run",
+      "duration_min": 30,
+      "calories": 250,
+      "_comment": "EDGE: bad timestamp format"
+    }
+  ],
+  "metadata": { "source": "test-suite" }
+}

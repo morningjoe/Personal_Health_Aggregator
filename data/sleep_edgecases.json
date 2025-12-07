@@ -1,0 +1,28 @@
+{
+  "records": [
+    {
+      "date": "2023-12-31",
+      "sleep_start": "2023-12-31T22:00:00Z",
+      "sleep_end": "2024-01-01T06:00:00Z",
+      "duration_hours": 8,
+      "quality_score": 82,
+      "_comment": "EDGE: cross-year sleep"
+    },
+    {
+      "date": "2023-10-09",
+      "sleep_start": "2023-10-09T07:00:00Z",
+      "sleep_end": "2023-10-09T07:00:00Z",
+      "duration_hours": 0,
+      "quality_score": 0,
+      "_comment": "EDGE: zero duration, minimum quality"
+    },
+    {
+      "date": "2023-10-08",
+      "sleep_start": "2023-10-08T06:00:00Z",
+      "sleep_end": "2023-10-08T14:00:00Z",
+      "duration_hours": 8,
+      "quality_score": 100,
+      "_comment": "EDGE: maximum quality score"
+    }
+  ]
+}

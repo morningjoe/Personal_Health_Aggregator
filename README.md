@@ -192,32 +192,74 @@ main() → load_sleep_data() → merge_by_day() → generate_json_output() → s
 
 ## Error Handling
 
-The application provides clear error messages for common issues:
+This project validates input data and handles errors gracefully. Invalid records
+are **skipped with warnings** printed to the console, allowing valid data to be
+processed normally. Below are the common validation categories and how they are handled.
 
-### Timezone Validation Error
+### Validation Strategy
+- **Invalid records are skipped**: The loader identifies bad data, prints a warning with
+  the record index and specific error reason, then continues processing remaining records.
+- **Critical errors still stop execution**: Missing files, invalid JSON, or incorrect
+  top-level JSON keys will stop execution and print clear error messages.
+- **Warnings show details**: Each skipped record displays its index and the validation
+  error (e.g., invalid timezone, missing field, out-of-range value, bad format).
+
+### Common Validation Errors (Examples)
+
+**Timezone Validation Error**
+- When: A workout `tz` value is not a valid IANA timezone (e.g., typo like `America/Los_Angel`)
+- Result: Record is skipped; warning printed: `Invalid timezone 'America/Los_Angel'. Use IANA timezone identifiers.`
+- Fix: Use a valid timezone (e.g., `America/Los_Angeles`). See the IANA list:
+  https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+
+**Missing Required Fields**
+- When: Required keys are absent from a record.
+- Sleep required fields: `sleep_start`, `sleep_end`, `duration_hours`, `quality_score`.
+- Workout required fields: `id`, `timestamp`, `tz`, `type`, `duration_min`, `calories`.
+- Result: Record is skipped; warning printed with field names and record index.
+
+**Invalid Numeric Values**
+- When: Numeric fields are out of expected ranges or the wrong type.
+- Validation rules:
+  - `duration_hours` (sleep): float, 0–24
+  - `quality_score`: int, 0–100
+  - `duration_min` (workout): int, 0–1440
+  - `calories`: int, ≥ 0
+- Result: Record is skipped; warning printed with field name, expected range, and actual value.
+- Example: `Invalid numeric values. Duration must be between 0 and 1440 minutes, got 2000`
+
+**Invalid Timestamp Format**
+- When: Timestamps do not match expected formats.
+- Formats expected:
+  - Sleep timestamps: ISO 8601 UTC with `Z` suffix, e.g., `2023-10-01T08:30:00Z`
+  - Workout timestamps: local time string `YYYY-MM-DD HH:MM:SS`, e.g., `2023-10-01 08:30:00`
+- Result: Record is skipped; warning printed with parsing error details.
+- Example: `Invalid timestamp format. Error: time data '2023/10/01 08:30' does not match format '%Y-%m-%d %H:%M:%S'`
+
+**File & Structure Errors** (Critical — execution stops)
+- When: Files are missing, not JSON, or the top-level keys are absent.
+- Requirements:
+  - Sleep JSON must include top-level `records` (a list).
+  - Workout JSON must include top-level `workout_log` (a list).
+- Result: Execution stops; error printed with specific issue and file path.
+
+### Error Handling Example
+
+When you run the app with data containing invalid records:
+
 ```
-Data Validation Error: Invalid timezone 'BadZone'.
-Use IANA timezone identifiers (e.g., 'America/Los_Angeles', 'Europe/London').
-See: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+Loading data...
+  Loaded 12 sleep records (UTC)
+  Warning: Skipped 5 invalid workout record(s):
+    - Record 8: Invalid timezone 'Bad/Timezone'. Use IANA timezone identifiers.
+    - Record 11: Missing required fields: tz. Required: calories, duration_min, id, timestamp, type, tz
+    - Record 12: Invalid numeric values. Duration must be between 0 and 1440 minutes, got -10
+    - Record 13: Invalid numeric values. Duration must be between 0 and 1440 minutes, got 2000
+    - Record 15: Invalid timestamp format. Error: time data '2023/10/01 08:30' does not match format '%Y-%m-%d %H:%M:%S'
+  Loaded 11 workout records (converted from local time)
 ```
 
-### Missing Required Fields Error
-```
-Data Validation Error: Sleep record 0: Missing required fields: quality_score.
-Required: duration_hours, quality_score, sleep_end, sleep_start
-```
-
-### Invalid Numeric Values Error
-```
-Data Validation Error: Workout record 0: Invalid numeric values.
-Duration must be between 0 and 1440 minutes, got -30
-```
-
-### Invalid Timestamp Format Error
-```
-Data Validation Error: Sleep record 0: Invalid timestamp format.
-Expected ISO 8601 format (e.g., '2023-10-01T00:30:00Z').
-```
+Valid records continue to be processed. Check the warnings to identify and fix problematic records in your input files.
 
 ## Edge Cases Handled
 
@@ -250,6 +292,26 @@ Personal_Health_Aggregator/
 │   └── workouts.json           # Workout data source
 ├── merged_health_data.json      # Generated output
 └── README.md                    # This file
+```
+
+## Test Files Included
+
+- `data/sleep_invalid.json`: Sleep records containing a mix of valid and invalid entries (out-of-range duration, missing fields, bad timestamp, future date) for testing validation and skipping behavior.
+- `data/workouts_invalid.json`: Workout records with intentional errors (invalid timezone, missing tz, negative/too-large duration, bad timestamp) to exercise validation paths.
+- `data/workouts_multipletz.json`: Valid workouts across multiple timezones (UTC, America/Los_Angeles, Europe/London, Asia/Tokyo) for cross-TZ and day-boundary testing.
+- `data/sleep_edgecases.json`: Valid edge-case sleep records (zero duration, maximum quality score, cross-year sleep) to verify aggregation and correlation handling.
+
+Run these example commands to exercise the test files:
+
+```powershell
+# Run invalid sets (shows skipping warnings)
+python main.py --sleep data/sleep_invalid.json --workouts data/workouts_invalid.json --verbose
+
+# Run multi-timezone set
+python main.py --sleep data/sleep.json --workouts data/workouts_multipletz.json --show-boundaries
+
+# Run edge-case sleep set
+python main.py --sleep data/sleep_edgecases.json --workouts data/workouts.json --show-summary
 ```
 
 ## Data Models
@@ -364,16 +426,18 @@ See complete list: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
 **Claude (AI Assistant):**
 - Day boundary crossing detection logic
-- Reporting functions and CLI interface
+- Reporting functions
 - Code modularization and refactoring
 - JSON output generation
-- Error handling and validation
 
 **Original Design/Architecture:**
+- CLI interface
+- Error handling and validation
 - Input/output JSON schemas
 - Merge algorithm and daily aggregation strategy
 - Edge cases identification and test scenarios
 - Data model definitions
+- Library References
 - Correlation metrics specification
 
 This is collaborative development with clear separation between architectural design and implementation.
