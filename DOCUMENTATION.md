@@ -18,14 +18,14 @@
 
 This project is the result of collaborative development with clear separation between original design/architecture and implementation:
 
-#### Development with Copilot AI Assistant - Implementation Phase
-- **Day boundary crossing detection**: Implemented the timezone conversion logic that detects when workout timestamps cross midnight
+#### Development in conjunction with Copilot AI Assistant - Implementation Phase
 - **Reporting functions**: Developed all console output functions (`print_day_boundary_analysis()`, `print_merged_data()`, `print_correlations()`)
 - **CLI interface**: Built the argparse-based command-line interface with comprehensive help messages
 - **Code modularization**: Refactored monolithic code into separate modules (models.py, data_loader.py, merger.py, reporter.py)
 - **JSON output generation**: Created JSON serialization functions with proper datetime handling
 
 #### Original Design/Drafting - Architecture Phase
+- **Day boundary crossing detection**: Implemented the timezone conversion logic that detects when workout timestamps cross midnight
 - **Input JSON schema**: Designed sleep.json and workouts.json formats with timezone support
 - **Output JSON structure**: Defined the merged output format including metadata, daily data, and correlations
 - **Merge algorithm**: Drafted the core logic for combining sleep and workout data by UTC date

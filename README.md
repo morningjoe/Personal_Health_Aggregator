@@ -425,12 +425,12 @@ See complete list: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 ## Credits and Attribution
 
 **Claude (AI Assistant):**
-- Day boundary crossing detection logic
 - Reporting functions
 - Code modularization and refactoring
 - JSON output generation
 
 **Original Design/Architecture:**
+- Day boundary crossing detection logic
 - CLI interface
 - Error handling and validation
 - Input/output JSON schemas
