@@ -1,0 +1,76 @@
+{
+  "workout_log": [
+    {
+      "id": "W001",
+      "timestamp": "2023-10-01 08:30:00",
+      "tz": "America/Los_Angeles",
+      "type": "Running",
+      "duration_min": 45,
+      "calories": 420
+    },
+    {
+      "id": "W002",
+      "timestamp": "2023-10-01 23:15:00",
+      "tz": "America/Los_Angeles",
+      "type": "Yoga",
+      "duration_min": 30,
+      "calories": 120,
+      "_comment": "EDGE CASE: 11:15 PM PST = Oct 2 06:15 UTC (crosses day boundary)"
+    },
+    {
+      "id": "W003",
+      "timestamp": "2023-10-02 06:00:00",
+      "tz": "America/Los_Angeles",
+      "type": "Cycling",
+      "duration_min": 60,
+      "calories": 550
+    },
+    {
+      "id": "W004",
+      "timestamp": "2023-10-03 17:30:00",
+      "tz": "America/Los_Angeles",
+      "type": "Weight Training",
+      "duration_min": 50,
+      "calories": 380
+    },
+    {
+      "id": "W005",
+      "timestamp": "2023-10-04 22:45:00",
+      "tz": "America/Los_Angeles",
+      "type": "HIIT",
+      "duration_min": 25,
+      "calories": 310,
+      "_comment": "EDGE CASE: 10:45 PM PST = Oct 5 05:45 UTC (crosses day boundary)"
+    },
+    {
+      "id": "W006",
+      "timestamp": "2023-10-05 12:00:00",
+      "tz": "America/Los_Angeles",
+      "type": "Swimming",
+      "duration_min": 40,
+      "calories": 350
+    },
+    {
+      "id": "W007",
+      "timestamp": "2023-10-06 07:00:00",
+      "tz": "America/Los_Angeles",
+      "type": "Running",
+      "duration_min": 35,
+      "calories": 320
+    },
+    {
+      "id": "W008",
+      "timestamp": "2023-10-06 23:30:00",
+      "tz": "America/Los_Angeles",
+      "type": "Stretching",
+      "duration_min": 20,
+      "calories": 60,
+      "_comment": "EDGE CASE: 11:30 PM PST = Oct 7 06:30 UTC (crosses day boundary)"
+    }
+  ],
+  "app_info": {
+    "name": "Strava",
+    "default_timezone": "America/Los_Angeles",
+    "format": "YYYY-MM-DD HH:MM:SS"
+  }
+}

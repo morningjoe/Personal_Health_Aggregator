@@ -1,0 +1,58 @@
+{
+  "records": [
+    {
+      "date": "2023-10-01",
+      "sleep_start": "2023-10-01T06:00:00Z",
+      "sleep_end": "2023-10-01T14:00:00Z",
+      "duration_hours": 8,
+      "quality_score": 85
+    },
+    {
+      "date": "2023-10-02",
+      "sleep_start": "2023-10-02T07:30:00Z",
+      "sleep_end": "2023-10-02T12:30:00Z",
+      "duration_hours": 5,
+      "quality_score": 62
+    },
+    {
+      "date": "2023-10-03",
+      "sleep_start": "2023-10-03T05:00:00Z",
+      "sleep_end": "2023-10-03T13:00:00Z",
+      "duration_hours": 8,
+      "quality_score": 88
+    },
+    {
+      "date": "2023-10-04",
+      "sleep_start": "2023-10-04T08:00:00Z",
+      "sleep_end": "2023-10-04T13:30:00Z",
+      "duration_hours": 5.5,
+      "quality_score": 58
+    },
+    {
+      "date": "2023-10-05",
+      "sleep_start": "2023-10-05T06:30:00Z",
+      "sleep_end": "2023-10-05T14:30:00Z",
+      "duration_hours": 8,
+      "quality_score": 90
+    },
+    {
+      "date": "2023-10-06",
+      "sleep_start": "2023-10-06T09:00:00Z",
+      "sleep_end": "2023-10-06T13:00:00Z",
+      "duration_hours": 4,
+      "quality_score": 45
+    },
+    {
+      "date": "2023-10-07",
+      "sleep_start": "2023-10-07T05:30:00Z",
+      "sleep_end": "2023-10-07T13:00:00Z",
+      "duration_hours": 7.5,
+      "quality_score": 82
+    }
+  ],
+  "metadata": {
+    "timezone": "UTC",
+    "device": "Garmin",
+    "version": "2.1"
+  }
+}
