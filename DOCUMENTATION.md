@@ -744,20 +744,6 @@ json.dump(datetime_obj.isoformat())  # String format
 
 Solution: Convert all datetime objects to ISO 8601 strings before JSON output.
 
-### Performance Considerations
-
-- **Time Complexity:** O(n) where n = total records
-- **Space Complexity:** O(d) where d = unique dates
-- **I/O:** Two reads, one write
-
-Typical performance (10K records):
-- Load sleep data: ~50ms
-- Load workout data: ~100ms
-- Merge & correlate: ~20ms
-- Generate JSON: ~30ms
-- **Total:** ~200ms
-
----
 
 ## Future Enhancements
 
