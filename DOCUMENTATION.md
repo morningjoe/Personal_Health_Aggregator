@@ -43,6 +43,12 @@ This project is the result of collaborative development with clear separation be
 
 ---
 
+## Data Sources
+
+- The example and test JSON files in the `data/` folder were created from exports and logs produced by `Strava` for activity/workout exports and the `Garmin` ecosystem (Garmin Connect / Garmin mobile app) for sleep and workout metrics.
+- Sleep scores, per-workout calories, and duration values referenced in the example files were taken from my personal Garmin Forerunner watch / Garmin Connect exports when constructing realistic sample data.
+
+
 ## Architecture Overview
 
 The application follows a layered architecture with clear separation of concerns:

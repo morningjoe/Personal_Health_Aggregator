@@ -190,6 +190,24 @@ main() → load_sleep_data() → merge_by_day() → generate_json_output() → s
 - Calculates average calories burned and workout frequency
 - Identifies patterns in exercise habits based on sleep quality
 
+#### Correlation Methodology
+- **Definitions:** Days with sleep < 6.0 hours are considered *low-sleep*; days with sleep ≥ 7.0 hours are considered *good-sleep*. Days between 6.0 and 7.0 hours are treated as neutral and excluded from the two-group comparison.
+- **Metrics computed:** For each group the tool reports `count`, `avg_calories_burned`, and (internally) average workout minutes and workout frequency. These are simple group means and counts (descriptive statistics).
+- **How to interpret:** The output shows differences in average calories (or workout minutes) between the two groups. A higher average on one side indicates an association in the dataset, not causation — this is descriptive, not a controlled study.
+- **Statistical notes:** This project uses group averages for clarity. If you require formal statistical testing (e.g., Pearson correlation, t-test, regression), consider exporting `merged_health_data.json` and running an external analysis with `pandas`/`scipy`.
+
+Example JSON keys produced:
+
+```
+correlations:
+  low_sleep_days:
+    count: <int>
+    avg_calories_burned: <float>
+  good_sleep_days:
+    count: <int>
+    avg_calories_burned: <float>
+```
+
 ## Error Handling
 
 This project validates input data and handles errors gracefully. Invalid records
